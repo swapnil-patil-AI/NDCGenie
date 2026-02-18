@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">
+  <defs>
+    <linearGradient id="bgGradFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7fafc"/>
+      <stop offset="100%" style="stop-color:#edf2f7"/>
+    </linearGradient>
+    
+    <linearGradient id="userBoxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#48bb78"/>
+      <stop offset="100%" style="stop-color:#38a169"/>
+    </linearGradient>
+    
+    <linearGradient id="streamlitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4b4b"/>
+      <stop offset="100%" style="stop-color:#d63031"/>
+    </linearGradient>
+    
+    <linearGradient id="aiBoxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#805ad5"/>
+      <stop offset="100%" style="stop-color:#6b46c1"/>
+    </linearGradient>
+    
+    <linearGradient id="claudeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ed8936"/>
+      <stop offset="100%" style="stop-color:#dd6b20"/>
+    </linearGradient>
+    
+    <linearGradient id="dataBoxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#38b2ac"/>
+      <stop offset="100%" style="stop-color:#319795"/>
+    </linearGradient>
+    
+    <filter id="shadowFlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+    
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 L3,6 Z" fill="#4a5568"/>
+    </marker>
+    
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 L3,6 Z" fill="#38a169"/>
+    </marker>
+    
+    <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 L3,6 Z" fill="#ed8936"/>
+    </marker>
+    
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 L3,6 Z" fill="#4299e1"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="700" fill="url(#bgGradFlow)"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Segoe UI, Arial" font-size="28" font-weight="700" fill="#1a365d" text-anchor="middle">
+    AeroTrack AI - Data Flow Diagram
+  </text>
+  <text x="600" y="65" font-family="Segoe UI, Arial" font-size="14" fill="#718096" text-anchor="middle">
+    Request/Response Flow for AI-Powered Transaction Queries
+  </text>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FLOW STEP 1: USER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(80, 120)">
+    <!-- Step number -->
+    <circle cx="0" cy="70" r="20" fill="url(#userBoxGrad)" filter="url(#shadowFlow)"/>
+    <text x="0" y="76" font-family="Segoe UI, Arial" font-size="16" font-weight="700" fill="white" text-anchor="middle">1</text>
+    
+    <!-- User box -->
+    <rect x="30" y="20" width="180" height="100" rx="12" fill="white" stroke="#48bb78" stroke-width="3" filter="url(#shadowFlow)"/>
+    <circle cx="120" cy="55" r="20" fill="#48bb78"/>
+    <circle cx="120" cy="48" r="8" fill="white"/>
+    <ellipse cx="120" cy="65" rx="12" ry="6" fill="white"/>
+    <text x="120" y="100" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#276749" text-anchor="middle">Customer Service Agent</text>
+  </g>
+  
+  <!-- Arrow 1→2 -->
+  <g>
+    <path d="M 290 170 Q 350 170 350 220 Q 350 270 410 270" fill="none" stroke="#38a169" stroke-width="3" marker-end="url(#arrowGreen)"/>
+    <rect x="305" y="200" width="90" height="40" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1"/>
+    <text x="350" y="215" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#276749" text-anchor="middle">User Query</text>
+    <text x="350" y="230" font-family="Segoe UI, Arial" font-size="8" fill="#4a5568" text-anchor="middle">"Show TXN-123"</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FLOW STEP 2: STREAMLIT -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(400, 200)">
+    <circle cx="0" cy="70" r="20" fill="url(#streamlitGrad)" filter="url(#shadowFlow)"/>
+    <text x="0" y="76" font-family="Segoe UI, Arial" font-size="16" font-weight="700" fill="white" text-anchor="middle">2</text>
+    
+    <rect x="30" y="20" width="200" height="100" rx="12" fill="white" stroke="#ff4b4b" stroke-width="3" filter="url(#shadowFlow)"/>
+    <text x="130" y="50" font-family="Segoe UI, Arial" font-size="14" font-weight="700" fill="#c53030" text-anchor="middle">Streamlit App</text>
+    <text x="130" y="70" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568" text-anchor="middle">app.py</text>
+    <line x1="50" y1="80" x2="210" y2="80" stroke="#fed7d7" stroke-width="1"/>
+    <text x="130" y="98" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">Session State • Chat UI</text>
+  </g>
+  
+  <!-- Arrow 2→3 -->
+  <g>
+    <path d="M 630 270 Q 700 270 700 320 Q 700 370 770 370" fill="none" stroke="#805ad5" stroke-width="3" marker-end="url(#arrow)"/>
+    <rect x="655" y="300" width="90" height="40" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+    <text x="700" y="315" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#6b46c1" text-anchor="middle">Messages[]</text>
+    <text x="700" y="330" font-family="Segoe UI, Arial" font-size="8" fill="#4a5568" text-anchor="middle">+ Transactions</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FLOW STEP 3: AI ASSISTANT -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(760, 300)">
+    <circle cx="0" cy="70" r="20" fill="url(#aiBoxGrad)" filter="url(#shadowFlow)"/>
+    <text x="0" y="76" font-family="Segoe UI, Arial" font-size="16" font-weight="700" fill="white" text-anchor="middle">3</text>
+    
+    <rect x="30" y="10" width="220" height="120" rx="12" fill="white" stroke="#805ad5" stroke-width="3" filter="url(#shadowFlow)"/>
+    <text x="140" y="40" font-family="Segoe UI, Arial" font-size="14" font-weight="700" fill="#553c9a" text-anchor="middle">AI Assistant</text>
+    <text x="140" y="58" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568" text-anchor="middle">ai_assistant.py</text>
+    <line x1="50" y1="68" x2="230" y2="68" stroke="#e9d8fd" stroke-width="1"/>
+    <text x="140" y="86" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">• Extract Conversation Context</text>
+    <text x="140" y="100" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">• Filter Transactions (max 25)</text>
+    <text x="140" y="114" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">• Build System Prompt</text>
+  </g>
+  
+  <!-- Arrow 3→4 -->
+  <g>
+    <path d="M 1010 370 Q 1060 370 1060 420 Q 1060 470 1010 470" fill="none" stroke="#ed8936" stroke-width="3" marker-end="url(#arrowOrange)"/>
+    <rect x="1025" y="400" width="80" height="40" rx="6" fill="#fffaf0" stroke="#ed8936" stroke-width="1"/>
+    <text x="1065" y="415" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#c05621" text-anchor="middle">API Call</text>
+    <text x="1065" y="430" font-family="Segoe UI, Arial" font-size="8" fill="#4a5568" text-anchor="middle">HTTPS</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FLOW STEP 4: CLAUDE API -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(760, 450)">
+    <circle cx="0" cy="70" r="20" fill="url(#claudeGrad)" filter="url(#shadowFlow)"/>
+    <text x="0" y="76" font-family="Segoe UI, Arial" font-size="16" font-weight="700" fill="white" text-anchor="middle">4</text>
+    
+    <rect x="30" y="20" width="220" height="100" rx="12" fill="white" stroke="#ed8936" stroke-width="3" filter="url(#shadowFlow)"/>
+    <text x="140" y="50" font-family="Segoe UI, Arial" font-size="14" font-weight="700" fill="#c05621" text-anchor="middle">🧠 Anthropic API</text>
+    <text x="140" y="70" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568" text-anchor="middle">Claude Sonnet 4</text>
+    <line x1="50" y1="80" x2="230" y2="80" stroke="#feebc8" stroke-width="1"/>
+    <text x="140" y="98" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">Natural Language Processing</text>
+  </g>
+  
+  <!-- Arrow 4→5 (Response back) -->
+  <g>
+    <path d="M 790 520 Q 700 520 700 490 Q 700 460 630 400" fill="none" stroke="#4299e1" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#arrowBlue)"/>
+    <rect x="645" y="450" width="100" height="40" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+    <text x="695" y="465" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#2b6cb0" text-anchor="middle">AI Response</text>
+    <text x="695" y="480" font-family="Segoe UI, Arial" font-size="8" fill="#4a5568" text-anchor="middle">Markdown Text</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FLOW STEP 5: BACK TO USER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- Arrow back to Streamlit -->
+  <g>
+    <path d="M 480 320 Q 400 400 320 400 Q 240 400 200 320" fill="none" stroke="#4299e1" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#arrowBlue)"/>
+    <rect x="295" y="380" width="100" height="40" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+    <text x="345" y="395" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#2b6cb0" text-anchor="middle">Render UI</text>
+    <text x="345" y="410" font-family="Segoe UI, Arial" font-size="8" fill="#4a5568" text-anchor="middle">Chat Message</text>
+  </g>
+  
+  <!-- Arrow back to User -->
+  <g>
+    <path d="M 200 220 Q 180 280 180 320" fill="none" stroke="#4299e1" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#arrowBlue)"/>
+  </g>
+  
+  <!-- Response box at user -->
+  <g transform="translate(80, 340)">
+    <rect x="30" y="0" width="180" height="70" rx="8" fill="#ebf8ff" stroke="#4299e1" stroke-width="2" filter="url(#shadowFlow)"/>
+    <text x="120" y="25" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">✅ Response Displayed</text>
+    <text x="120" y="45" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Transaction details</text>
+    <text x="120" y="60" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">with recommendations</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- DATA STORE -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(400, 450)">
+    <circle cx="0" cy="50" r="16" fill="url(#dataBoxGrad)"/>
+    <text x="0" y="55" font-family="Segoe UI, Arial" font-size="12" font-weight="700" fill="white" text-anchor="middle">D</text>
+    
+    <!-- Database cylinder -->
+    <ellipse cx="120" cy="30" rx="80" ry="20" fill="url(#dataBoxGrad)" filter="url(#shadowFlow)"/>
+    <rect x="40" y="30" width="160" height="60" fill="url(#dataBoxGrad)"/>
+    <ellipse cx="120" cy="90" rx="80" ry="20" fill="#2c7a7b"/>
+    <ellipse cx="120" cy="30" rx="70" ry="15" fill="#81e6d9"/>
+    
+    <text x="120" y="60" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="white" text-anchor="middle">Demo Data</text>
+    <text x="120" y="78" font-family="Segoe UI, Arial" font-size="10" fill="#e6fffa" text-anchor="middle">200 Transactions</text>
+  </g>
+  
+  <!-- Arrow from Data to Streamlit -->
+  <path d="M 520 480 Q 540 400 540 300" fill="none" stroke="#38b2ac" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="555" y="390" font-family="Segoe UI, Arial" font-size="9" fill="#319795">Load Data</text>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CONTEXT MEMORY BOX -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(80, 470)">
+    <rect x="0" y="0" width="280" height="130" rx="10" fill="white" stroke="#805ad5" stroke-width="2" filter="url(#shadowFlow)"/>
+    <rect x="0" y="0" width="280" height="30" rx="10" fill="#805ad5"/>
+    <text x="140" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="white" text-anchor="middle">🧠 Conversation Context Memory</text>
+    
+    <text x="15" y="50" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Extracted from chat history:</text>
+    <text x="25" y="70" font-family="Segoe UI, Arial" font-size="9" fill="#718096">• Transaction IDs mentioned</text>
+    <text x="25" y="85" font-family="Segoe UI, Arial" font-size="9" fill="#718096">• Customer emails found</text>
+    <text x="25" y="100" font-family="Segoe UI, Arial" font-size="9" fill="#718096">• Topics discussed (failures, refunds)</text>
+    <text x="25" y="115" font-family="Segoe UI, Arial" font-size="9" fill="#718096">• Pending actions (escalate, process)</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LEGEND -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(900, 550)">
+    <rect x="0" y="0" width="250" height="120" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1" filter="url(#shadowFlow)"/>
+    <text x="125" y="25" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#2d3748" text-anchor="middle">Flow Legend</text>
+    <line x1="10" y1="35" x2="240" y2="35" stroke="#e2e8f0" stroke-width="1"/>
+    
+    <line x1="20" y1="55" x2="60" y2="55" stroke="#38a169" stroke-width="3"/>
+    <text x="70" y="59" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Request Flow</text>
+    
+    <line x1="20" y1="80" x2="60" y2="80" stroke="#4299e1" stroke-width="3" stroke-dasharray="8,4"/>
+    <text x="70" y="84" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Response Flow</text>
+    
+    <line x1="20" y1="105" x2="60" y2="105" stroke="#38b2ac" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="70" y="109" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Data Flow</text>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="680" font-family="Segoe UI, Arial" font-size="11" fill="#a0aec0" text-anchor="middle">
+    AeroTrack AI v2.1.0 • Data Flow Diagram • Latency: ~500-1500ms per AI query
+  </text>
+</svg>
