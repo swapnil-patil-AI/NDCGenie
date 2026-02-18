@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a365d" />
+      <stop offset="50%" style="stop-color:#2b6cb0" />
+      <stop offset="100%" style="stop-color:#4299e1" />
+    </linearGradient>
+    <filter id="iconShadow">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1a365d" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="32" cy="32" r="30" fill="#ffffff" filter="url(#iconShadow)"/>
+  
+  <!-- Orbit ring -->
+  <ellipse cx="32" cy="32" rx="24" ry="10" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5" transform="rotate(-15, 32, 32)"/>
+  
+  <!-- Aircraft -->
+  <g transform="translate(32, 32) rotate(-45)">
+    <path d="M-14,0 C-14,-2.5 -11,-3.5 -7,-3.5 L13,-2.5 C18,-2 22,-1 24,0 C22,1 18,2 13,2.5 L-7,3.5 C-11,3.5 -14,2.5 -14,0 Z" 
+          fill="url(#iconGrad)"/>
+    <ellipse cx="17" cy="0" rx="4" ry="1.5" fill="#63b3ed" opacity="0.8"/>
+    <path d="M0,-3 L-7,-16 C-8,-18 -5,-18 -4,-16 L3,-3.5 Z" fill="url(#iconGrad)"/>
+    <path d="M0,3 L-7,16 C-8,18 -5,18 -4,16 L3,3.5 Z" fill="url(#iconGrad)"/>
+    <path d="M-12,-2 L-17,-9 C-18,-11 -15,-11 -14,-9 L-11,-2.5 Z" fill="url(#iconGrad)"/>
+    <path d="M-12,2 L-17,9 C-18,11 -15,11 -14,9 L-11,2.5 Z" fill="url(#iconGrad)"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="32" cy="32" r="5" fill="#4299e1"/>
+  <circle cx="32" cy="32" r="2.5" fill="#ffffff"/>
+  
+  <!-- Tracking dots -->
+  <circle cx="12" cy="28" r="2.5" fill="#38a169"/>
+  <circle cx="52" cy="36" r="2.5" fill="#38a169"/>
+</svg>

@@ -1,0 +1,423 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" width="1400" height="1000">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a365d"/>
+      <stop offset="100%" style="stop-color:#2b6cb0"/>
+    </linearGradient>
+    
+    <linearGradient id="userGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#48bb78"/>
+      <stop offset="100%" style="stop-color:#38a169"/>
+    </linearGradient>
+    
+    <linearGradient id="frontendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4299e1"/>
+      <stop offset="100%" style="stop-color:#3182ce"/>
+    </linearGradient>
+    
+    <linearGradient id="backendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#805ad5"/>
+      <stop offset="100%" style="stop-color:#6b46c1"/>
+    </linearGradient>
+    
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ed8936"/>
+      <stop offset="100%" style="stop-color:#dd6b20"/>
+    </linearGradient>
+    
+    <linearGradient id="dataGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#38b2ac"/>
+      <stop offset="100%" style="stop-color:#319795"/>
+    </linearGradient>
+    
+    <linearGradient id="externalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e53e3e"/>
+      <stop offset="100%" style="stop-color:#c53030"/>
+    </linearGradient>
+    
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+    
+    <!-- Arrow marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#718096"/>
+    </marker>
+    
+    <marker id="arrowheadBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4299e1"/>
+    </marker>
+    
+    <marker id="arrowheadOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ed8936"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="1000" fill="#f7fafc"/>
+  
+  <!-- Grid pattern -->
+  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+    <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
+  </pattern>
+  <rect width="1400" height="1000" fill="url(#grid)"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1400" height="60" fill="url(#headerGrad)"/>
+  <text x="700" y="38" font-family="Segoe UI, Arial" font-size="24" font-weight="700" fill="white" text-anchor="middle">
+    ✈️ AeroTrack AI - System Architecture
+  </text>
+  <text x="1380" y="38" font-family="Segoe UI, Arial" font-size="12" fill="#a0aec0" text-anchor="end">v2.1.0</text>
+  
+  <!-- Legend -->
+  <g transform="translate(1150, 80)">
+    <rect x="0" y="0" width="230" height="160" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" filter="url(#shadow)"/>
+    <text x="115" y="25" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="#2d3748" text-anchor="middle">Legend</text>
+    <line x1="10" y1="35" x2="220" y2="35" stroke="#e2e8f0" stroke-width="1"/>
+    
+    <rect x="15" y="48" width="20" height="14" rx="3" fill="url(#userGrad)"/>
+    <text x="45" y="59" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568">User Layer</text>
+    
+    <rect x="15" y="70" width="20" height="14" rx="3" fill="url(#frontendGrad)"/>
+    <text x="45" y="81" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568">Frontend (Streamlit)</text>
+    
+    <rect x="15" y="92" width="20" height="14" rx="3" fill="url(#backendGrad)"/>
+    <text x="45" y="103" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568">Backend Logic</text>
+    
+    <rect x="15" y="114" width="20" height="14" rx="3" fill="url(#aiGrad)"/>
+    <text x="45" y="125" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568">AI Layer (Claude)</text>
+    
+    <rect x="15" y="136" width="20" height="14" rx="3" fill="url(#dataGrad)"/>
+    <text x="45" y="147" font-family="Segoe UI, Arial" font-size="11" fill="#4a5568">Data Layer</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- USER LAYER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(50, 90)">
+    <!-- Section Label -->
+    <text x="0" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#718096">USER LAYER</text>
+    
+    <!-- User Icon -->
+    <g transform="translate(80, 50)">
+      <circle cx="60" cy="30" r="45" fill="url(#userGrad)" filter="url(#shadow)"/>
+      <circle cx="60" cy="20" r="15" fill="white"/>
+      <ellipse cx="60" cy="50" rx="22" ry="12" fill="white"/>
+      <text x="60" y="90" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#2d3748" text-anchor="middle">Customer Service</text>
+      <text x="60" y="105" font-family="Segoe UI, Arial" font-size="10" fill="#718096" text-anchor="middle">Agent</text>
+    </g>
+    
+    <!-- Browser -->
+    <g transform="translate(220, 40)">
+      <rect x="0" y="0" width="140" height="90" rx="8" fill="white" stroke="#48bb78" stroke-width="2" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="140" height="20" rx="8" fill="#48bb78"/>
+      <circle cx="15" cy="10" r="4" fill="#fc8181"/>
+      <circle cx="30" cy="10" r="4" fill="#f6e05e"/>
+      <circle cx="45" cy="10" r="4" fill="#68d391"/>
+      <rect x="10" y="30" width="120" height="8" rx="2" fill="#e2e8f0"/>
+      <rect x="10" y="45" width="80" height="8" rx="2" fill="#e2e8f0"/>
+      <rect x="10" y="60" width="100" height="8" rx="2" fill="#e2e8f0"/>
+      <text x="70" y="110" font-family="Segoe UI, Arial" font-size="11" font-weight="500" fill="#2d3748" text-anchor="middle">Web Browser</text>
+    </g>
+  </g>
+  
+  <!-- Arrow: User to Frontend -->
+  <line x1="410" y1="180" x2="410" y2="250" stroke="#718096" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="420" y="220" font-family="Segoe UI, Arial" font-size="10" fill="#718096">HTTPS</text>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FRONTEND LAYER (Streamlit) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(50, 260)">
+    <!-- Section Label -->
+    <text x="0" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#718096">FRONTEND LAYER</text>
+    
+    <!-- Main App Container -->
+    <rect x="30" y="35" width="760" height="140" rx="10" fill="white" stroke="#4299e1" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="30" y="35" width="760" height="30" rx="10" fill="url(#frontendGrad)"/>
+    <text x="410" y="55" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="white" text-anchor="middle">app.py - Streamlit Application (1,526 lines)</text>
+    
+    <!-- UI Components -->
+    <g transform="translate(50, 80)">
+      <rect x="0" y="0" width="130" height="80" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="65" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">🤖 AI Assistant</text>
+      <text x="65" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Chat Interface</text>
+      <text x="65" y="52" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Message History</text>
+      <text x="65" y="66" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Quick Actions</text>
+    </g>
+    
+    <g transform="translate(200, 80)">
+      <rect x="0" y="0" width="130" height="80" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="65" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">📋 Transactions</text>
+      <text x="65" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Search &amp; Filter</text>
+      <text x="65" y="52" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Data Table</text>
+      <text x="65" y="66" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Detail View</text>
+    </g>
+    
+    <g transform="translate(350, 80)">
+      <rect x="0" y="0" width="130" height="80" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="65" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">📊 Analytics</text>
+      <text x="65" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">KPI Metrics</text>
+      <text x="65" y="52" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Charts</text>
+      <text x="65" y="66" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Trend Analysis</text>
+    </g>
+    
+    <g transform="translate(500, 80)">
+      <rect x="0" y="0" width="130" height="80" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="65" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">📤 Export</text>
+      <text x="65" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">CSV Export</text>
+      <text x="65" y="52" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">JSON Export</text>
+      <text x="65" y="66" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Report Gen</text>
+    </g>
+    
+    <g transform="translate(650, 80)">
+      <rect x="0" y="0" width="120" height="80" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="60" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">⚙️ Config</text>
+      <text x="60" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">API Settings</text>
+      <text x="60" y="52" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Session State</text>
+      <text x="60" y="66" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Theme</text>
+    </g>
+  </g>
+  
+  <!-- Arrow: Frontend to Backend -->
+  <line x1="410" y1="435" x2="410" y2="490" stroke="#718096" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- BACKEND LAYER (Utils) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(50, 500)">
+    <!-- Section Label -->
+    <text x="0" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#718096">BACKEND LAYER</text>
+    
+    <!-- Utils Container -->
+    <rect x="30" y="35" width="550" height="140" rx="10" fill="white" stroke="#805ad5" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="30" y="35" width="550" height="30" rx="10" fill="url(#backendGrad)"/>
+    <text x="305" y="55" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="white" text-anchor="middle">utils/ - Business Logic Layer</text>
+    
+    <!-- Utils Modules -->
+    <g transform="translate(50, 80)">
+      <rect x="0" y="0" width="120" height="80" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+      <text x="60" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#6b46c1" text-anchor="middle">config.py</text>
+      <text x="60" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">224 lines</text>
+      <line x1="10" y1="45" x2="110" y2="45" stroke="#e9d8fd" stroke-width="1"/>
+      <text x="60" y="60" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">App Settings</text>
+      <text x="60" y="72" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Error Messages</text>
+    </g>
+    
+    <g transform="translate(190, 80)">
+      <rect x="0" y="0" width="120" height="80" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+      <text x="60" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#6b46c1" text-anchor="middle">validators.py</text>
+      <text x="60" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">420 lines</text>
+      <line x1="10" y1="45" x2="110" y2="45" stroke="#e9d8fd" stroke-width="1"/>
+      <text x="60" y="60" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Data Validation</text>
+      <text x="60" y="72" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Input Sanitization</text>
+    </g>
+    
+    <g transform="translate(330, 80)">
+      <rect x="0" y="0" width="120" height="80" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+      <text x="60" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#6b46c1" text-anchor="middle">helpers.py</text>
+      <text x="60" y="38" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">660 lines</text>
+      <line x1="10" y1="45" x2="110" y2="45" stroke="#e9d8fd" stroke-width="1"/>
+      <text x="60" y="60" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Search/Filter</text>
+      <text x="60" y="72" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Export Functions</text>
+    </g>
+    
+    <g transform="translate(470, 80)">
+      <rect x="0" y="0" width="90" height="80" rx="6" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+      <text x="45" y="45" font-family="Segoe UI, Arial" font-size="24" fill="#805ad5" text-anchor="middle">🔗</text>
+      <text x="45" y="70" font-family="Segoe UI, Arial" font-size="9" fill="#718096" text-anchor="middle">Shared</text>
+    </g>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- AI LAYER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(650, 500)">
+    <!-- AI Container -->
+    <rect x="30" y="35" width="320" height="140" rx="10" fill="white" stroke="#ed8936" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="30" y="35" width="320" height="30" rx="10" fill="url(#aiGrad)"/>
+    <text x="190" y="55" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="white" text-anchor="middle">🧠 AI Integration Layer</text>
+    
+    <!-- AI Module -->
+    <g transform="translate(50, 80)">
+      <rect x="0" y="0" width="280" height="80" rx="6" fill="#fffaf0" stroke="#ed8936" stroke-width="1"/>
+      <text x="140" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#c05621" text-anchor="middle">ai_assistant.py (550 lines)</text>
+      <line x1="10" y1="30" x2="270" y2="30" stroke="#feebc8" stroke-width="1"/>
+      
+      <text x="20" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">• Conversation Context Tracking</text>
+      <text x="20" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">• Smart Transaction Filtering</text>
+      <text x="150" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">• Token Management</text>
+      <text x="150" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">• Error Handling</text>
+    </g>
+  </g>
+  
+  <!-- Arrow: AI to External API -->
+  <line x1="1000" y1="575" x2="1100" y2="575" stroke="#ed8936" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowheadOrange)"/>
+  <text x="1050" y="565" font-family="Segoe UI, Arial" font-size="10" fill="#ed8936">API Call</text>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- EXTERNAL SERVICES -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(1100, 500)">
+    <rect x="0" y="35" width="180" height="140" rx="10" fill="white" stroke="#e53e3e" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="35" width="180" height="30" rx="10" fill="url(#externalGrad)"/>
+    <text x="90" y="55" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="white" text-anchor="middle">External Services</text>
+    
+    <g transform="translate(20, 80)">
+      <rect x="0" y="0" width="140" height="35" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1"/>
+      <text x="70" y="15" font-family="Segoe UI, Arial" font-size="10" font-weight="600" fill="#c53030" text-anchor="middle">Anthropic API</text>
+      <text x="70" y="28" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Claude Sonnet 4</text>
+    </g>
+    
+    <g transform="translate(20, 125)">
+      <rect x="0" y="0" width="140" height="35" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="70" y="15" font-family="Segoe UI, Arial" font-size="10" font-weight="500" fill="#38a169" text-anchor="middle">Future: Database</text>
+      <text x="70" y="28" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">PostgreSQL/MongoDB</text>
+    </g>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- DATA LAYER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(50, 700)">
+    <!-- Section Label -->
+    <text x="0" y="20" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="#718096">DATA LAYER</text>
+    
+    <!-- Data Container -->
+    <rect x="30" y="35" width="550" height="130" rx="10" fill="white" stroke="#38b2ac" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="30" y="35" width="550" height="30" rx="10" fill="url(#dataGrad)"/>
+    <text x="305" y="55" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="white" text-anchor="middle">data/ - Data Generation &amp; Models</text>
+    
+    <!-- Data Modules -->
+    <g transform="translate(50, 75)">
+      <rect x="0" y="0" width="200" height="75" rx="6" fill="#e6fffa" stroke="#38b2ac" stroke-width="1"/>
+      <text x="100" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#234e52" text-anchor="middle">demo_data.py (821 lines)</text>
+      <line x1="10" y1="30" x2="190" y2="30" stroke="#b2f5ea" stroke-width="1"/>
+      <text x="100" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">200 Realistic Transactions</text>
+      <text x="100" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">8 Airlines • 12 Routes</text>
+    </g>
+    
+    <g transform="translate(270, 75)">
+      <rect x="0" y="0" width="150" height="75" rx="6" fill="#e6fffa" stroke="#38b2ac" stroke-width="1"/>
+      <text x="75" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#234e52" text-anchor="middle">Data Models</text>
+      <line x1="10" y1="30" x2="140" y2="30" stroke="#b2f5ea" stroke-width="1"/>
+      <text x="75" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Transaction</text>
+      <text x="75" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Customer • Flight</text>
+    </g>
+    
+    <g transform="translate(440, 75)">
+      <rect x="0" y="0" width="120" height="75" rx="6" fill="#e6fffa" stroke="#38b2ac" stroke-width="1"/>
+      <text x="60" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#234e52" text-anchor="middle">Enums</text>
+      <line x1="10" y1="30" x2="110" y2="30" stroke="#b2f5ea" stroke-width="1"/>
+      <text x="60" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Status Types</text>
+      <text x="60" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Priority Levels</text>
+    </g>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- COMPONENTS LAYER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(650, 700)">
+    <!-- Components Container -->
+    <rect x="30" y="35" width="320" height="130" rx="10" fill="white" stroke="#4299e1" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="30" y="35" width="320" height="30" rx="10" fill="url(#frontendGrad)"/>
+    <text x="190" y="55" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="white" text-anchor="middle">components/ - UI Components</text>
+    
+    <g transform="translate(50, 75)">
+      <rect x="0" y="0" width="280" height="75" rx="6" fill="#ebf8ff" stroke="#4299e1" stroke-width="1"/>
+      <text x="140" y="20" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#2b6cb0" text-anchor="middle">ui_components.py (1,044 lines)</text>
+      <line x1="10" y1="30" x2="270" y2="30" stroke="#bee3f8" stroke-width="1"/>
+      <text x="80" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Status Badges</text>
+      <text x="200" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Priority Badges</text>
+      <text x="80" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Lifecycle Visual</text>
+      <text x="200" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568" text-anchor="middle">Chat Messages</text>
+    </g>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- DEPLOYMENT LAYER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(1050, 700)">
+    <rect x="0" y="35" width="230" height="130" rx="10" fill="white" stroke="#718096" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="35" width="230" height="30" rx="10" fill="#718096"/>
+    <text x="115" y="55" font-family="Segoe UI, Arial" font-size="12" font-weight="600" fill="white" text-anchor="middle">🚀 Deployment</text>
+    
+    <g transform="translate(15, 75)">
+      <rect x="0" y="0" width="95" height="35" rx="4" fill="#f7fafc" stroke="#718096" stroke-width="1"/>
+      <text x="48" y="15" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#4a5568" text-anchor="middle">Dockerfile</text>
+      <text x="48" y="28" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Python 3.11</text>
+    </g>
+    
+    <g transform="translate(120, 75)">
+      <rect x="0" y="0" width="95" height="35" rx="4" fill="#f7fafc" stroke="#718096" stroke-width="1"/>
+      <text x="48" y="15" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#4a5568" text-anchor="middle">Compose</text>
+      <text x="48" y="28" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Port 8501</text>
+    </g>
+    
+    <g transform="translate(15, 118)">
+      <rect x="0" y="0" width="200" height="35" rx="4" fill="#faf5ff" stroke="#805ad5" stroke-width="1"/>
+      <text x="100" y="15" font-family="Segoe UI, Arial" font-size="9" font-weight="600" fill="#6b46c1" text-anchor="middle">☁️ Streamlit Cloud Ready</text>
+      <text x="100" y="28" font-family="Segoe UI, Arial" font-size="8" fill="#718096" text-anchor="middle">Secrets Management</text>
+    </g>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CONNECTION ARROWS -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- Backend to Data -->
+  <line x1="305" y1="675" x2="305" y2="730" stroke="#718096" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- Backend to Components -->
+  <path d="M 580 610 Q 650 650 680 730" fill="none" stroke="#718096" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- Components to Frontend -->
+  <path d="M 850 700 Q 900 450 770 400" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- Data to Frontend -->
+  <path d="M 200 700 Q 150 500 120 400" fill="none" stroke="#38b2ac" stroke-width="1.5" stroke-dasharray="4,2"/>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- DATA FLOW ANNOTATIONS -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(870, 280)">
+    <rect x="0" y="0" width="250" height="100" rx="8" fill="#fffaf0" stroke="#ed8936" stroke-width="1" filter="url(#shadow)"/>
+    <text x="125" y="22" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#c05621" text-anchor="middle">🔄 AI Request Flow</text>
+    <line x1="10" y1="30" x2="240" y2="30" stroke="#feebc8" stroke-width="1"/>
+    <text x="15" y="48" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">1. User sends query</text>
+    <text x="15" y="62" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">2. Context extracted from history</text>
+    <text x="15" y="76" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">3. Relevant transactions filtered</text>
+    <text x="15" y="90" font-family="Segoe UI, Arial" font-size="9" fill="#4a5568">4. Claude API called → Response</text>
+  </g>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- METRICS BOX -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <g transform="translate(870, 400)">
+    <rect x="0" y="0" width="250" height="80" rx="8" fill="#f0fff4" stroke="#38a169" stroke-width="1" filter="url(#shadow)"/>
+    <text x="125" y="22" font-family="Segoe UI, Arial" font-size="11" font-weight="600" fill="#276749" text-anchor="middle">📊 Code Metrics</text>
+    <line x1="10" y1="30" x2="240" y2="30" stroke="#c6f6d5" stroke-width="1"/>
+    <text x="15" y="48" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Total Lines: <tspan font-weight="600">5,350</tspan></text>
+    <text x="15" y="64" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Files: <tspan font-weight="600">24</tspan> (13 Python)</text>
+    <text x="140" y="48" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Modules: <tspan font-weight="600">6</tspan></text>
+    <text x="140" y="64" font-family="Segoe UI, Arial" font-size="10" fill="#4a5568">Version: <tspan font-weight="600">2.1.0</tspan></text>
+  </g>
+  
+  <!-- Footer -->
+  <rect x="0" y="960" width="1400" height="40" fill="#2d3748"/>
+  <text x="700" y="985" font-family="Segoe UI, Arial" font-size="12" fill="#a0aec0" text-anchor="middle">
+    AeroTrack AI Architecture Diagram • Enterprise Airline Transaction Lifecycle Tracker • Powered by Claude AI
+  </text>
+</svg>
