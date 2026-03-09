@@ -1,821 +1,511 @@
 """
-Demo Data Generator for NDC Genie
-Generates realistic airline transaction data with complete lifecycle tracking.
+demo_data.py - NDC Genie Demo Data Generator
+
+Generates realistic NDC short-sell transaction data.
+
+NDC Short-Sell Flow:
+  Shopping  → returns shopping_offer_ids[] (1–200 offers)
+  OfferPrice → takes 1 shopping_offer_id → returns priced_offer_id
+  SeatAvail  → returns seat_offer_ids[]
+  ServiceAvail → returns service_offer_ids[]
+  OrderCreate → takes priced_offer_id + seat_offer_ids + service_offer_ids → creates order_id
+
+Each flow stage carries forward the transaction_id and relevant offer IDs from previous stages.
 """
 
 import random
 import string
-import hashlib
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, asdict
-import json
-
-from utils.config import app_config
+from typing import Optional
+import hashlib
 
 
-@dataclass
-class Customer:
-    """Customer data model"""
-    customer_id: str
-    first_name: str
-    last_name: str
-    email: str
-    phone: str
-    loyalty_tier: str
-    loyalty_points: int
-    member_since: str
-    preferred_language: str
-    nationality: str
-    passport_country: str
-    total_bookings: int
-    lifetime_value: float
-    
-    @property
-    def full_name(self) -> str:
-        return f"{self.first_name} {self.last_name}"
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+AIRLINES = [
+    ("SkyWings Airlines", "SW"),
+    ("AeroJet", "AJ"),
+    ("BlueSky Air", "BS"),
+    ("Pacific Wings", "PW"),
+    ("Atlantic Express", "AE"),
+    ("Northern Star", "NS"),
+    ("SunRise Air", "SR"),
+    ("CloudHopper", "CH"),
+]
+
+AIRPORTS = [
+    "JFK", "LAX", "ORD", "DFW", "DEN", "SFO", "SEA", "MIA",
+    "BOS", "ATL", "LHR", "CDG", "FRA", "AMS", "DXB", "SIN",
+    "HKG", "NRT", "SYD", "YYZ", "GRU", "MEX",
+]
+
+CABIN_CLASSES = ["Economy", "Premium Economy", "Business", "First"]
+LOYALTY_TIERS = ["Standard", "Silver", "Gold", "Platinum"]
+PAYMENT_METHODS = ["Credit Card", "Debit Card", "PayPal", "Apple Pay", "Bank Transfer"]
+
+FIRST_NAMES = [
+    "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
+    "William", "Barbara", "David", "Elizabeth", "Richard", "Susan", "Joseph", "Jessica",
+    "Thomas", "Sarah", "Charles", "Karen", "Wei", "Priya", "Mohammed", "Fatima",
+    "Yuki", "Carlos", "Ana", "Luca", "Sofia", "Pierre",
+]
+
+LAST_NAMES = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+    "Wilson", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin",
+    "Thompson", "Young", "Walker", "Robinson", "Patel", "Nakamura", "Santos", "Müller",
+    "Dubois", "Rossi", "Kim", "Chen", "Ali", "Singh",
+]
+
+ERROR_SCENARIOS = [
+    {
+        "stage": "Payment",
+        "code": "ERR-PAY-001",
+        "message": "Card declined - Insufficient funds",
+        "resolution": "Advise customer to use different payment method or check account balance",
+    },
+    {
+        "stage": "Payment",
+        "code": "ERR-PAY-002",
+        "message": "Payment gateway timeout",
+        "resolution": "Retry payment or use alternative payment method",
+    },
+    {
+        "stage": "Ticketing",
+        "code": "ERR-TKT-001",
+        "message": "GDS ticketing failure - Queue full",
+        "resolution": "Manually requeue ticket issuance",
+    },
+    {
+        "stage": "Ticketing",
+        "code": "ERR-TKT-002",
+        "message": "Fare basis mismatch during ticketing",
+        "resolution": "Reprice itinerary and rebook",
+    },
+    {
+        "stage": "Booking",
+        "code": "ERR-BKG-001",
+        "message": "Seat inventory unavailable",
+        "resolution": "Offer alternative flights or cabin class",
+    },
+    {
+        "stage": "OfferPrice",
+        "code": "ERR-OFP-001",
+        "message": "Offer expired before pricing",
+        "resolution": "Initiate new shopping request to refresh offer",
+    },
+    {
+        "stage": "OrderCreate",
+        "code": "ERR-ORD-001",
+        "message": "Offer ID mismatch in OrderCreate request",
+        "resolution": "Re-validate priced offer ID and resubmit",
+    },
+]
+
+# ---------------------------------------------------------------------------
+# ID Generators
+# ---------------------------------------------------------------------------
+
+def _rand_upper(n: int, rng: random.Random) -> str:
+    return "".join(rng.choices(string.ascii_uppercase + string.digits, k=n))
 
 
-@dataclass
-class Flight:
-    """Flight data model"""
-    flight_number: str
-    airline_code: str
-    airline_name: str
-    origin: str
-    origin_city: str
-    destination: str
-    destination_city: str
-    departure_date: str
-    departure_time: str
-    arrival_time: str
-    duration_minutes: int
-    aircraft_type: str
-    cabin_class: str
-    fare_class: str
-    passengers: int
-    seat_numbers: List[str]
-    meal_preference: str
-    special_requests: List[str]
+def generate_transaction_id(rng: random.Random, date: datetime) -> str:
+    """TXN-YYYYMM-XXXXXXXX"""
+    suffix = _rand_upper(8, rng)
+    return f"TXN-{date.strftime('%Y%m')}-{suffix}"
 
 
-@dataclass
-class Pricing:
-    """Pricing data model"""
-    base_fare: float
-    taxes: float
-    fuel_surcharge: float
-    booking_fee: float
-    insurance: float
-    baggage_fee: float
-    seat_selection_fee: float
-    meal_upgrade: float
-    discount_amount: float
-    discount_code: Optional[str]
-    total: float
-    currency: str
-    exchange_rate: float
-    original_currency: str
-    original_amount: float
+def generate_shopping_offer_ids(rng: random.Random, txn_id: str, count: int) -> list[str]:
+    """
+    Shopping returns 1–200 offer IDs.
+    Format: SHP-<txn_suffix>-<index>-<random>
+    """
+    txn_suffix = txn_id.split("-")[-1]
+    return [f"SHP-{txn_suffix}-{i+1:03d}-{_rand_upper(4, rng)}" for i in range(count)]
 
 
-@dataclass
-class LifecycleStage:
-    """Individual lifecycle stage data"""
-    status: str
-    timestamp: Optional[str]
-    details: Optional[str]
-    duration_seconds: Optional[int]
-    attempts: int
-    metadata: Dict[str, Any]
+def generate_priced_offer_id(rng: random.Random, shopping_offer_id: str) -> str:
+    """
+    OfferPrice picks one shopping offer and returns a single priced offer ID.
+    Format: OFP-<shopping_suffix>-<random>
+    """
+    suffix = shopping_offer_id.split("-")[-1]
+    return f"OFP-{suffix}-{_rand_upper(6, rng)}"
 
 
-@dataclass
-class ErrorInfo:
-    """Error information for failed transactions"""
-    error_stage: str
-    error_code: str
-    error_category: str
-    error_message: str
-    technical_details: str
-    requires_action: bool
-    escalation_level: Optional[str]
-    suggested_resolution: str
-    auto_retry_eligible: bool
-    retry_count: int
+def generate_seat_offer_ids(rng: random.Random, txn_id: str, count: int) -> list[str]:
+    """
+    SeatAvailability returns 1–N seat offer IDs (one per passenger/segment).
+    Format: SAV-<txn_suffix>-<seat_code>-<random>
+    """
+    txn_suffix = txn_id.split("-")[-1]
+    seat_codes = ["WDW", "MID", "AIS", "EXT", "BLK"]
+    return [
+        f"SAV-{txn_suffix}-{rng.choice(seat_codes)}-{_rand_upper(4, rng)}"
+        for _ in range(count)
+    ]
 
 
-@dataclass
-class RefundInfo:
-    """Refund information"""
-    status: str
-    refund_reference: str
-    refund_amount: float
-    refund_percentage: float
-    refund_reason: str
-    refund_type: str
-    initiated_at: Optional[str]
-    processed_at: Optional[str]
-    expected_date: Optional[str]
-    payment_method: str
-    cancellation_fee: float
-    processing_notes: str
+def generate_service_offer_ids(rng: random.Random, txn_id: str, count: int) -> list[str]:
+    """
+    ServiceAvailability returns ancillary service offer IDs.
+    Format: SVC-<txn_suffix>-<service_code>-<random>
+    """
+    txn_suffix = txn_id.split("-")[-1]
+    service_codes = ["BAG", "MEAL", "UPGD", "LONG", "INSUR", "WIFI"]
+    return [
+        f"SVC-{txn_suffix}-{rng.choice(service_codes)}-{_rand_upper(4, rng)}"
+        for _ in range(count)
+    ]
 
 
-@dataclass
-class AgentNote:
-    """Agent note/comment"""
-    note_id: str
-    agent_id: str
-    agent_name: str
-    timestamp: str
-    note_type: str
-    content: str
-    is_internal: bool
-    attachments: List[str]
+def generate_order_id(rng: random.Random, txn_id: str) -> str:
+    """
+    OrderCreate returns a single order ID.
+    Format: ORD-<txn_suffix>-<random>
+    """
+    txn_suffix = txn_id.split("-")[-1]
+    return f"ORD-{txn_suffix}-{_rand_upper(8, rng)}"
 
 
-@dataclass
-class CommunicationLog:
-    """Customer communication log"""
-    comm_id: str
-    channel: str
-    direction: str
-    timestamp: str
-    subject: str
-    summary: str
-    agent_id: Optional[str]
-    sentiment: str
-    resolved: bool
+def generate_pnr(rng: random.Random) -> str:
+    return _rand_upper(6, rng)
 
+
+def generate_eticket(rng: random.Random) -> str:
+    airline_code = str(rng.randint(100, 999))
+    number = "".join([str(rng.randint(0, 9)) for _ in range(10)])
+    return f"{airline_code}-{number}"
+
+
+# ---------------------------------------------------------------------------
+# NDC Flow Stage Builder
+# ---------------------------------------------------------------------------
+
+# Flow stages in order — each stage is only present if the transaction reached it
+NDC_STAGES = ["Shopping", "OfferPrice", "SeatAvail", "ServiceAvail", "OrderCreate"]
+
+# Status at the deepest stage reached
+TERMINAL_STATUSES = {
+    "success": "Completed",
+    "failed": "Failed",
+    "pending": "In Progress",
+    "refunded": "Refunded",
+}
+
+
+def _build_ndc_ids(rng: random.Random, txn_id: str, deepest_stage: str, status: str) -> dict:
+    """
+    Build the NDC ID chain for a transaction depending on how far it progressed.
+
+    Returns a dict with keys present only for stages that were reached:
+      shopping_offer_ids    - list (Shopping stage)
+      selected_shopping_offer_id - str (OfferPrice uses one of these)
+      priced_offer_id       - str (OfferPrice stage)
+      seat_offer_ids        - list (SeatAvail stage)
+      service_offer_ids     - list (ServiceAvail stage)
+      order_id              - str (OrderCreate stage)
+    """
+    stage_index = NDC_STAGES.index(deepest_stage)
+    ids = {}
+
+    # Shopping is always first — generate offer IDs
+    shopping_count = rng.randint(3, 30)
+    ids["shopping_offer_ids"] = generate_shopping_offer_ids(rng, txn_id, shopping_count)
+    ids["shopping_offer_count"] = shopping_count
+
+    if stage_index >= 1:  # OfferPrice
+        selected = rng.choice(ids["shopping_offer_ids"])
+        ids["selected_shopping_offer_id"] = selected
+        ids["priced_offer_id"] = generate_priced_offer_id(rng, selected)
+
+    if stage_index >= 2:  # SeatAvail
+        seat_count = rng.randint(1, 4)
+        ids["seat_offer_ids"] = generate_seat_offer_ids(rng, txn_id, seat_count)
+
+    if stage_index >= 3:  # ServiceAvail
+        svc_count = rng.randint(1, 5)
+        ids["service_offer_ids"] = generate_service_offer_ids(rng, txn_id, svc_count)
+
+    if stage_index >= 4:  # OrderCreate
+        ids["order_id"] = generate_order_id(rng, txn_id)
+
+    return ids
+
+
+# ---------------------------------------------------------------------------
+# Main Transaction Generator
+# ---------------------------------------------------------------------------
 
 class DemoDataGenerator:
-    """Generates comprehensive demo data for the application"""
-    
-    # Name pools
-    FIRST_NAMES = [
-        "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
-        "William", "Elizabeth", "David", "Barbara", "Richard", "Susan", "Joseph", "Jessica",
-        "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
-        "Raj", "Priya", "Arjun", "Aisha", "Mohammed", "Fatima", "Wei", "Mei",
-        "Yuki", "Hiroshi", "Carlos", "Maria", "Juan", "Sofia", "Pierre", "Marie",
-        "Hans", "Anna", "Ivan", "Olga", "Sven", "Ingrid", "Ahmed", "Layla"
-    ]
-    
-    LAST_NAMES = [
-        "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-        "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-        "Taylor", "Thomas", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-        "Patel", "Kumar", "Singh", "Chen", "Wang", "Kim", "Tanaka", "Suzuki",
-        "Mueller", "Schneider", "Fischer", "Dubois", "Bernard", "Rossi", "Ferrari",
-        "Santos", "Oliveira", "Petrov", "Ivanov", "Johansson", "Nielsen", "Hansen"
-    ]
-    
-    NATIONALITIES = [
-        "United States", "United Kingdom", "Canada", "Australia", "Germany",
-        "France", "India", "China", "Japan", "Brazil", "Mexico", "Spain",
-        "Italy", "Netherlands", "Sweden", "Singapore", "UAE", "South Korea"
-    ]
-    
-    AIRCRAFT_TYPES = [
-        "Boeing 737-800", "Boeing 777-300ER", "Boeing 787-9 Dreamliner",
-        "Airbus A320neo", "Airbus A350-900", "Airbus A380-800",
-        "Embraer E190", "Boeing 767-300ER"
-    ]
-    
-    CABIN_CLASSES = ["Economy", "Premium Economy", "Business", "First"]
-    FARE_CLASSES = ["Y", "B", "M", "H", "K", "L", "Q", "V", "W", "S", "N"]
-    
-    MEAL_PREFERENCES = [
-        "Regular", "Vegetarian", "Vegan", "Halal", "Kosher", 
-        "Gluten-Free", "Diabetic", "Low-Sodium", "Child Meal"
-    ]
-    
-    SPECIAL_REQUESTS = [
-        "Wheelchair assistance", "Unaccompanied minor", "Bassinet",
-        "Extra legroom", "Quiet zone", "Pet in cabin", "Medical oxygen",
-        "Special assistance required", "Connecting flight assistance"
-    ]
-    
-    PAYMENT_METHODS = [
-        "Visa ****4532", "Visa ****8821", "Mastercard ****7891", 
-        "Mastercard ****3344", "Amex ****3456", "Amex ****9012",
-        "PayPal", "Apple Pay", "Google Pay", "Bank Transfer",
-        "Airline Credit", "Travel Voucher"
-    ]
-    
-    COMMUNICATION_CHANNELS = ["Email", "Phone", "Chat", "Social Media", "SMS"]
-    
     def __init__(self, seed: int = 42):
-        """Initialize the generator with a seed for reproducibility"""
-        random.seed(seed)
-        self.transaction_counter = 0
-        
-    def generate_id(self, prefix: str, length: int = 8) -> str:
-        """Generate a unique ID with prefix"""
-        chars = string.ascii_uppercase + string.digits
-        return f"{prefix}-{''.join(random.choices(chars, k=length))}"
-    
-    def generate_customer(self) -> Customer:
-        """Generate a realistic customer profile"""
-        first_name = random.choice(self.FIRST_NAMES)
-        last_name = random.choice(self.LAST_NAMES)
-        email_domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "proton.me"]
-        
-        loyalty_tiers = ["None", "Bronze", "Silver", "Gold", "Platinum", "Diamond"]
-        tier = random.choices(loyalty_tiers, weights=[30, 25, 20, 15, 7, 3])[0]
-        
-        tier_points = {
-            "None": 0, "Bronze": random.randint(1000, 10000),
-            "Silver": random.randint(10000, 25000), "Gold": random.randint(25000, 50000),
-            "Platinum": random.randint(50000, 100000), "Diamond": random.randint(100000, 500000)
+        self.rng = random.Random(seed)
+
+    def _random_date(self, days_back: int = 90) -> datetime:
+        offset = self.rng.randint(0, days_back * 24 * 60)
+        return datetime.now() - timedelta(minutes=offset)
+
+    def _random_customer(self) -> dict:
+        first = self.rng.choice(FIRST_NAMES)
+        last = self.rng.choice(LAST_NAMES)
+        email_domain = self.rng.choice(["gmail.com", "yahoo.com", "outlook.com", "company.com"])
+        return {
+            "customer_id": f"CUST-{self.rng.randint(10000, 99999)}",
+            "first_name": first,
+            "last_name": last,
+            "email": f"{first.lower()}.{last.lower()}@{email_domain}",
+            "phone": f"+1-{self.rng.randint(200,999)}-{self.rng.randint(100,999)}-{self.rng.randint(1000,9999)}",
+            "loyalty_tier": self.rng.choice(LOYALTY_TIERS),
+            "loyalty_points": self.rng.randint(0, 200000),
+            "member_since": (datetime.now() - timedelta(days=self.rng.randint(30, 3000))).strftime("%Y-%m-%d"),
+            "lifetime_value": round(self.rng.uniform(100, 50000), 2),
         }
-        
-        member_years = {"None": 0, "Bronze": 1, "Silver": 2, "Gold": 3, "Platinum": 5, "Diamond": 8}
-        member_since = datetime.now() - timedelta(days=365 * member_years.get(tier, 0) + random.randint(0, 365))
-        
-        nationality = random.choice(self.NATIONALITIES)
-        
-        return Customer(
-            customer_id=self.generate_id("CUST", 6),
-            first_name=first_name,
-            last_name=last_name,
-            email=f"{first_name.lower()}.{last_name.lower()}{random.randint(1, 999)}@{random.choice(email_domains)}",
-            phone=f"+1-{random.randint(200, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
-            loyalty_tier=tier,
-            loyalty_points=tier_points[tier],
-            member_since=member_since.strftime("%Y-%m-%d"),
-            preferred_language=random.choice(["English", "Spanish", "French", "German", "Chinese", "Japanese"]),
-            nationality=nationality,
-            passport_country=nationality,
-            total_bookings=random.randint(1, 50) if tier != "None" else random.randint(0, 3),
-            lifetime_value=round(random.uniform(500, 50000) if tier != "None" else random.uniform(0, 500), 2)
-        )
-    
-    def generate_flight(self, airline: Dict) -> Flight:
-        """Generate realistic flight details"""
-        route = random.choice(app_config.ROUTES)
-        
-        # Generate realistic times
-        departure_hour = random.randint(6, 22)
-        departure_minute = random.choice([0, 15, 30, 45])
-        
-        # Calculate duration based on distance (rough estimate: 500 mph average)
-        base_duration = int(route["distance"] / 8)  # minutes
-        duration = base_duration + random.randint(-30, 60)
-        
-        departure_time = f"{departure_hour:02d}:{departure_minute:02d}"
-        arrival_dt = datetime.strptime(departure_time, "%H:%M") + timedelta(minutes=duration)
-        arrival_time = arrival_dt.strftime("%H:%M")
-        
-        # Generate seat numbers
-        passengers = random.randint(1, 4)
-        rows = list(range(1, 40))
-        seats = ["A", "B", "C", "D", "E", "F"]
-        seat_numbers = [f"{random.choice(rows)}{random.choice(seats)}" for _ in range(passengers)]
-        
-        cabin_class = random.choices(
-            self.CABIN_CLASSES,
-            weights=[60, 20, 15, 5]
-        )[0]
-        
-        special_reqs = random.sample(
-            self.SPECIAL_REQUESTS, 
-            k=random.randint(0, 2)
-        ) if random.random() > 0.7 else []
-        
-        return Flight(
-            flight_number=f"{airline['code']}{random.randint(100, 9999)}",
-            airline_code=airline["code"],
-            airline_name=airline["name"],
-            origin=route["origin"],
-            origin_city=route["origin_city"],
-            destination=route["destination"],
-            destination_city=route["destination_city"],
-            departure_date=(datetime.now() + timedelta(days=random.randint(1, 90))).strftime("%Y-%m-%d"),
-            departure_time=departure_time,
-            arrival_time=arrival_time,
-            duration_minutes=duration,
-            aircraft_type=random.choice(self.AIRCRAFT_TYPES),
-            cabin_class=cabin_class,
-            fare_class=random.choice(self.FARE_CLASSES),
-            passengers=passengers,
-            seat_numbers=seat_numbers,
-            meal_preference=random.choice(self.MEAL_PREFERENCES),
-            special_requests=special_reqs
-        )
-    
-    def generate_pricing(self, flight: Flight) -> Pricing:
-        """Generate realistic pricing breakdown"""
-        # Base fare depends on cabin class and distance
-        class_multipliers = {"Economy": 1, "Premium Economy": 1.8, "Business": 3.5, "First": 6}
-        base_fare = random.randint(150, 800) * class_multipliers[flight.cabin_class] * flight.passengers
-        
-        taxes = round(base_fare * random.uniform(0.10, 0.20), 2)
-        fuel_surcharge = round(base_fare * random.uniform(0.05, 0.15), 2)
-        booking_fee = round(random.uniform(15, 35) * flight.passengers, 2)
-        insurance = round(random.uniform(20, 50) * flight.passengers, 2) if random.random() > 0.5 else 0
-        baggage_fee = round(random.uniform(30, 60) * flight.passengers, 2) if random.random() > 0.6 else 0
-        seat_fee = round(random.uniform(10, 50) * flight.passengers, 2) if random.random() > 0.7 else 0
-        meal_upgrade = round(random.uniform(15, 30) * flight.passengers, 2) if random.random() > 0.8 else 0
-        
-        # Discount
-        has_discount = random.random() > 0.7
-        discount_codes = ["SUMMER25", "LOYALTY10", "FIRST20", "FLASH15", "MEMBER5"]
-        discount_amount = round((base_fare + taxes) * random.uniform(0.05, 0.20), 2) if has_discount else 0
-        discount_code = random.choice(discount_codes) if has_discount else None
-        
-        total = round(
-            base_fare + taxes + fuel_surcharge + booking_fee + 
-            insurance + baggage_fee + seat_fee + meal_upgrade - discount_amount, 2
-        )
-        
-        # Currency handling
-        currencies = [("USD", 1.0), ("EUR", 0.92), ("GBP", 0.79), ("CAD", 1.36), ("AUD", 1.53)]
-        orig_currency, rate = random.choice(currencies)
-        
-        return Pricing(
-            base_fare=round(base_fare, 2),
-            taxes=taxes,
-            fuel_surcharge=fuel_surcharge,
-            booking_fee=booking_fee,
-            insurance=insurance,
-            baggage_fee=baggage_fee,
-            seat_selection_fee=seat_fee,
-            meal_upgrade=meal_upgrade,
-            discount_amount=discount_amount,
-            discount_code=discount_code,
-            total=total,
-            currency="USD",
-            exchange_rate=rate,
-            original_currency=orig_currency,
-            original_amount=round(total * rate, 2)
-        )
-    
-    def generate_lifecycle(self, outcome: str, base_time: datetime) -> Dict[str, LifecycleStage]:
-        """Generate detailed lifecycle stages based on outcome"""
-        lifecycle = {}
-        current_time = base_time
-        
-        # Search stage - always completed
-        search_duration = random.randint(30, 300)
-        lifecycle["search"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details=f"Customer searched for flights - {random.randint(5, 25)} results shown",
-            duration_seconds=search_duration,
-            attempts=1,
-            metadata={
-                "results_count": random.randint(5, 25),
-                "filters_applied": random.choice([
-                    "direct flights only",
-                    "price low to high",
-                    "departure time morning",
-                    "specific airline"
+
+    def _random_flight(self) -> dict:
+        airline_name, code = self.rng.choice(AIRLINES)
+        origin, destination = self.rng.sample(AIRPORTS, 2)
+        dep_date = datetime.now() + timedelta(days=self.rng.randint(-30, 180))
+        return {
+            "flight_number": f"{code}{self.rng.randint(100, 9999)}",
+            "airline_name": airline_name,
+            "origin": origin,
+            "destination": destination,
+            "departure_date": dep_date.strftime("%Y-%m-%d"),
+            "departure_time": f"{self.rng.randint(0,23):02d}:{self.rng.choice(['00','15','30','45'])}",
+            "cabin_class": self.rng.choice(CABIN_CLASSES),
+            "passengers": self.rng.randint(1, 4),
+        }
+
+    def _random_pricing(self, cabin: str, pax: int) -> dict:
+        base_map = {"Economy": 200, "Premium Economy": 500, "Business": 1200, "First": 3000}
+        base = base_map.get(cabin, 300) * pax * self.rng.uniform(0.7, 2.5)
+        taxes = base * self.rng.uniform(0.1, 0.25)
+        fees = self.rng.uniform(10, 80)
+        total = base + taxes + fees
+        return {
+            "base_fare": round(base, 2),
+            "taxes": round(taxes, 2),
+            "fees": round(fees, 2),
+            "total": round(total, 2),
+            "currency": "USD",
+            "payment_method": self.rng.choice(PAYMENT_METHODS),
+        }
+
+    def generate_transaction(self, created_at: Optional[datetime] = None) -> dict:
+        rng = self.rng
+        if created_at is None:
+            created_at = self._random_date()
+
+        txn_id = generate_transaction_id(rng, created_at)
+
+        # Decide how far this transaction got in the NDC flow
+        # Weights: more transactions complete full flow, some fail at various stages
+        stage_weights = [5, 15, 10, 10, 60]  # Shopping, OfferPrice, Seat, Service, OrderCreate
+        deepest_stage = rng.choices(NDC_STAGES, weights=stage_weights, k=1)[0]
+        stage_index = NDC_STAGES.index(deepest_stage)
+
+        # Decide terminal status
+        if deepest_stage == "OrderCreate":
+            status_weights = {"Completed": 70, "Failed": 15, "In Progress": 5, "Refunded": 10}
+        elif deepest_stage in ("SeatAvail", "ServiceAvail"):
+            status_weights = {"Failed": 40, "In Progress": 50, "Completed": 10, "Refunded": 0}
+        elif deepest_stage == "OfferPrice":
+            status_weights = {"Failed": 60, "In Progress": 40, "Completed": 0, "Refunded": 0}
+        else:  # Shopping only
+            status_weights = {"Failed": 30, "In Progress": 70, "Completed": 0, "Refunded": 0}
+
+        status_choices = list(status_weights.keys())
+        status_wts = list(status_weights.values())
+        status = rng.choices(status_choices, weights=status_wts, k=1)[0]
+
+        # Priority
+        priority_weights = {"Critical": 5, "High": 20, "Medium": 50, "Low": 25}
+        priority = rng.choices(list(priority_weights.keys()), weights=list(priority_weights.values()), k=1)[0]
+
+        # Build NDC ID chain
+        ndc_ids = _build_ndc_ids(rng, txn_id, deepest_stage, status)
+
+        # Build lifecycle
+        lifecycle = _build_lifecycle(rng, created_at, deepest_stage, status, ndc_ids)
+
+        # Error info (only for failed transactions)
+        error_info = None
+        if status == "Failed":
+            err = rng.choice(ERROR_SCENARIOS)
+            error_info = {
+                "error_stage": err["stage"],
+                "error_code": err["code"],
+                "error_message": err["message"],
+                "suggested_resolution": err["resolution"],
+                "occurred_at": (created_at + timedelta(minutes=rng.randint(1, 30))).isoformat(),
+            }
+
+        # Refund info
+        refund_info = None
+        if status == "Refunded":
+            flight = lifecycle.get("_flight_ref", {})
+            pricing = lifecycle.get("_pricing_ref", {})
+            refund_pct = rng.uniform(0.5, 1.0)
+            refund_amount = round(pricing.get("total", 500) * refund_pct, 2)
+            refund_info = {
+                "refund_id": f"REF-{txn_id.split('-')[-1]}-{_rand_upper(6, rng)}",
+                "refund_amount": refund_amount,
+                "refund_reason": rng.choice([
+                    "Customer cancellation",
+                    "Schedule change",
+                    "Flight cancellation",
+                    "Duplicate booking",
+                    "Medical emergency",
                 ]),
-                "device": random.choice(["desktop", "mobile", "tablet"]),
-                "browser": random.choice(["Chrome", "Safari", "Firefox", "Edge"])
+                "refund_status": rng.choice(["Pending", "Processing", "Completed"]),
+                "initiated_at": (created_at + timedelta(hours=rng.randint(1, 48))).isoformat(),
             }
+
+        customer = self._random_customer()
+        flight = self._random_flight()
+        pricing = self._random_pricing(flight["cabin_class"], flight["passengers"])
+
+        sla_breach = (
+            status in ("Failed", "In Progress")
+            and (datetime.now() - created_at).total_seconds() > 4 * 3600
+            and priority in ("Critical", "High")
         )
-        current_time += timedelta(seconds=search_duration)
-        
-        # Selection stage
-        if outcome == "abandoned":
-            lifecycle["selection"] = LifecycleStage(
-                status="not_reached",
-                timestamp=None,
-                details="Customer abandoned before selection",
-                duration_seconds=None,
-                attempts=0,
-                metadata={"abandonment_point": "search_results"}
-            )
-            return lifecycle
-        
-        selection_duration = random.randint(60, 600)
-        lifecycle["selection"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details="Flight selected and added to cart",
-            duration_seconds=selection_duration,
-            attempts=random.randint(1, 3),
-            metadata={
-                "alternatives_viewed": random.randint(2, 8),
-                "price_comparison": True,
-                "fare_rules_viewed": random.choice([True, False])
-            }
-        )
-        current_time += timedelta(seconds=selection_duration)
-        
-        # Booking stage
-        if outcome == "booking_failed":
-            failure = random.choice(app_config.ERROR_CATEGORIES["booking"])
-            lifecycle["booking"] = LifecycleStage(
-                status="failed",
-                timestamp=current_time.isoformat(),
-                details=failure,
-                duration_seconds=random.randint(30, 180),
-                attempts=random.randint(1, 3),
-                metadata={
-                    "error_code": f"BK-{random.randint(1000, 9999)}",
-                    "passenger_details_valid": random.choice([True, False]),
-                    "inventory_check": "failed"
-                }
-            )
-            return lifecycle
-        
-        booking_duration = random.randint(120, 600)
-        lifecycle["booking"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details="Booking confirmed - passenger details verified",
-            duration_seconds=booking_duration,
-            attempts=1,
-            metadata={
-                "booking_ref": self.generate_id("", 6),
-                "passenger_details_verified": True,
-                "special_requests_logged": True
-            }
-        )
-        current_time += timedelta(seconds=booking_duration)
-        
-        # Payment stage
-        if outcome == "payment_failed":
-            failure = random.choice(app_config.ERROR_CATEGORIES["payment"])
-            lifecycle["payment"] = LifecycleStage(
-                status="failed",
-                timestamp=current_time.isoformat(),
-                details=failure,
-                duration_seconds=random.randint(10, 60),
-                attempts=random.randint(1, 4),
-                metadata={
-                    "payment_method": random.choice(self.PAYMENT_METHODS),
-                    "amount_attempted": random.uniform(200, 5000),
-                    "gateway_response": failure,
-                    "fraud_score": random.randint(0, 100),
-                    "3ds_attempted": random.choice([True, False])
-                }
-            )
-            return lifecycle
-        
-        payment_duration = random.randint(15, 90)
-        lifecycle["payment"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details="Payment processed successfully",
-            duration_seconds=payment_duration,
-            attempts=1,
-            metadata={
-                "payment_method": random.choice(self.PAYMENT_METHODS),
-                "authorization_code": f"AUTH-{random.randint(100000, 999999)}",
-                "transaction_id": self.generate_id("PAY", 10),
-                "fraud_score": random.randint(0, 30),
-                "3ds_verified": True
-            }
-        )
-        current_time += timedelta(seconds=payment_duration)
-        
-        # Ticketing stage
-        if outcome == "ticketing_failed":
-            failure = random.choice(app_config.ERROR_CATEGORIES["ticketing"])
-            lifecycle["ticketing"] = LifecycleStage(
-                status="failed",
-                timestamp=current_time.isoformat(),
-                details=failure,
-                duration_seconds=random.randint(5, 30),
-                attempts=random.randint(1, 3),
-                metadata={
-                    "pnr_created": random.choice([True, False]),
-                    "gds_response": failure,
-                    "ticket_number": None
-                }
-            )
-            return lifecycle
-        
-        ticketing_duration = random.randint(5, 30)
-        pnr = self.generate_id("", 6)
-        lifecycle["ticketing"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details="E-ticket issued successfully",
-            duration_seconds=ticketing_duration,
-            attempts=1,
-            metadata={
-                "pnr": pnr,
-                "e_ticket_number": f"098-{random.randint(1000000000, 9999999999)}",
-                "itinerary_sent": True,
-                "calendar_invite": random.choice([True, False])
-            }
-        )
-        current_time += timedelta(seconds=ticketing_duration)
-        
-        # Confirmation stage
-        lifecycle["confirmation"] = LifecycleStage(
-            status="completed",
-            timestamp=current_time.isoformat(),
-            details="Confirmation email and SMS sent to customer",
-            duration_seconds=random.randint(1, 5),
-            attempts=1,
-            metadata={
-                "email_sent": True,
-                "sms_sent": True,
-                "app_notification": random.choice([True, False])
-            }
-        )
-        
-        # Refund stage (if applicable)
-        if outcome in ["refund_initiated", "refund_completed", "refund_rejected"]:
-            refund_time = current_time + timedelta(days=random.randint(1, 14))
-            lifecycle["refund"] = LifecycleStage(
-                status="completed" if outcome == "refund_completed" else "pending" if outcome == "refund_initiated" else "rejected",
-                timestamp=refund_time.isoformat(),
-                details=f"Refund {outcome.replace('refund_', '')}",
-                duration_seconds=None,
-                attempts=1,
-                metadata={
-                    "refund_reference": self.generate_id("REF", 8),
-                    "processing_time_days": random.randint(3, 14)
-                }
-            )
-        else:
-            lifecycle["refund"] = LifecycleStage(
-                status="not_applicable",
-                timestamp=None,
-                details=None,
-                duration_seconds=None,
-                attempts=0,
-                metadata={}
-            )
-        
-        return lifecycle
-    
-    def generate_error_info(self, outcome: str, lifecycle: Dict) -> Optional[ErrorInfo]:
-        """Generate detailed error information for failed transactions"""
-        if "failed" not in outcome:
-            return None
-        
-        stage = outcome.replace("_failed", "")
-        stage_data = lifecycle.get(stage, {})
-        
-        error_message = stage_data.details if isinstance(stage_data, LifecycleStage) else "Unknown error"
-        
-        suggested_resolutions = {
-            "payment": [
-                "Advise customer to use different payment method",
-                "Verify card details and retry",
-                "Contact card issuer for authorization",
-                "Check for sufficient funds",
-                "Try again without VPN/proxy"
-            ],
-            "booking": [
-                "Search for alternative flights",
-                "Clear session and restart booking",
-                "Verify passenger details format",
-                "Contact inventory team",
-                "Check for system maintenance"
-            ],
-            "ticketing": [
-                "Retry ticket issuance",
-                "Contact GDS support",
-                "Verify PNR status",
-                "Manual ticket issuance required",
-                "Escalate to ticketing team"
-            ]
-        }
-        
-        return ErrorInfo(
-            error_stage=stage.capitalize(),
-            error_code=f"ERR-{stage.upper()[:3]}-{random.randint(1000, 9999)}",
-            error_category=stage,
-            error_message=error_message,
-            technical_details=f"Stack trace: {stage}_service.process() failed at line {random.randint(100, 500)}",
-            requires_action=random.choice([True, False]),
-            escalation_level=random.choice(["L1", "L2", "L3"]) if random.random() > 0.5 else None,
-            suggested_resolution=random.choice(suggested_resolutions.get(stage, ["Contact support"])),
-            auto_retry_eligible=stage in ["payment", "ticketing"],
-            retry_count=random.randint(0, 3)
-        )
-    
-    def generate_refund_info(self, outcome: str, pricing: Pricing, base_time: datetime) -> Optional[RefundInfo]:
-        """Generate refund information for refund transactions"""
-        if "refund" not in outcome:
-            return None
-        
-        refund_reason = random.choice(app_config.REFUND_REASONS)
-        
-        # Calculate refund amount based on reason and timing
-        refund_percentages = {
-            "Flight cancelled by airline": 1.0,
-            "Overbooking compensation": 1.0,
-            "Force majeure event": 1.0,
-            "Technical error during booking": 1.0,
-            "Customer requested cancellation": random.uniform(0.5, 0.9),
-            "Schedule change - customer opted out": 0.95,
-            "Medical emergency": random.uniform(0.7, 0.95),
-            "Duplicate booking": 1.0,
-            "Price guarantee claim": random.uniform(0.1, 0.3),
-            "Service not as described": random.uniform(0.5, 1.0),
-            "Visa/travel document issues": random.uniform(0.6, 0.85),
-            "Flight delay compensation": random.uniform(0.2, 0.5)
-        }
-        
-        refund_pct = refund_percentages.get(refund_reason, 0.8)
-        cancellation_fee = round(pricing.total * (1 - refund_pct), 2) if refund_pct < 1 else 0
-        refund_amount = round(pricing.total - cancellation_fee, 2)
-        
-        initiated_at = base_time + timedelta(days=random.randint(1, 7))
-        processed_at = initiated_at + timedelta(days=random.randint(1, 10)) if outcome == "refund_completed" else None
-        expected_date = initiated_at + timedelta(days=random.randint(7, 21))
-        
-        status_map = {
-            "refund_initiated": "Pending",
-            "refund_completed": "Completed",
-            "refund_rejected": "Rejected"
-        }
-        
-        return RefundInfo(
-            status=status_map.get(outcome, "Pending"),
-            refund_reference=self.generate_id("REF", 8),
-            refund_amount=refund_amount,
-            refund_percentage=round(refund_pct * 100, 1),
-            refund_reason=refund_reason,
-            refund_type=random.choice(["Original Payment Method", "Airline Credit", "Bank Transfer"]),
-            initiated_at=initiated_at.isoformat(),
-            processed_at=processed_at.isoformat() if processed_at else None,
-            expected_date=expected_date.strftime("%Y-%m-%d"),
-            payment_method=random.choice(self.PAYMENT_METHODS),
-            cancellation_fee=cancellation_fee,
-            processing_notes=random.choice([
-                "Standard processing",
-                "Expedited due to airline cancellation",
-                "Awaiting bank confirmation",
-                "Manual review required",
-                "Processing complete"
-            ])
-        )
-    
-    def generate_agent_notes(self, outcome: str, base_time: datetime) -> List[AgentNote]:
-        """Generate agent notes for the transaction"""
-        if random.random() > 0.6:  # 40% chance of having notes
-            return []
-        
-        note_templates = {
-            "payment_failed": [
-                ("Initial Contact", "Customer contacted regarding failed payment. Advised to verify card details."),
-                ("Follow-up", "Customer retried with different card. Still failing. Escalated to payment team."),
-                ("Resolution", "Payment issue resolved. Customer used alternative payment method.")
-            ],
-            "booking_failed": [
-                ("Initial Contact", "Booking failed due to inventory issue. Searching for alternatives."),
-                ("Alternative Offered", "Offered alternative flight with similar timing. Customer considering."),
-                ("Resolved", "Customer accepted alternative. New booking confirmed.")
-            ],
-            "refund_initiated": [
-                ("Refund Request", "Customer requested refund due to schedule change."),
-                ("Processing", "Refund request submitted to finance team."),
-                ("Update", "Refund approved. Processing within 7-10 business days.")
-            ],
-            "completed": [
-                ("Confirmation", "Booking confirmed. Customer received all documents."),
-                ("Query", "Customer called to confirm baggage allowance. Information provided.")
-            ]
-        }
-        
-        templates = note_templates.get(outcome, note_templates["completed"])
-        notes = []
-        
-        current_time = base_time + timedelta(hours=random.randint(1, 48))
-        
-        for note_type, content in templates[:random.randint(1, len(templates))]:
-            agent_id = f"AGT-{random.randint(100, 999)}"
-            notes.append(AgentNote(
-                note_id=self.generate_id("NOTE", 6),
-                agent_id=agent_id,
-                agent_name=f"{random.choice(self.FIRST_NAMES)} {random.choice(self.LAST_NAMES)[:1]}.",
-                timestamp=current_time.isoformat(),
-                note_type=note_type,
-                content=content,
-                is_internal=random.choice([True, False]),
-                attachments=[]
-            ))
-            current_time += timedelta(hours=random.randint(2, 24))
-        
-        return notes
-    
-    def generate_communication_log(self, outcome: str, base_time: datetime) -> List[CommunicationLog]:
-        """Generate customer communication history"""
-        if random.random() > 0.5:  # 50% chance of communications
-            return []
-        
-        comms = []
-        current_time = base_time + timedelta(hours=random.randint(1, 72))
-        
-        comm_count = random.randint(1, 4)
-        
-        subjects = [
-            "Booking Confirmation Query",
-            "Payment Issue Follow-up", 
-            "Refund Status Inquiry",
-            "Flight Change Request",
-            "Seat Selection Change",
-            "Special Assistance Request"
-        ]
-        
-        for _ in range(comm_count):
-            channel = random.choice(self.COMMUNICATION_CHANNELS)
-            comms.append(CommunicationLog(
-                comm_id=self.generate_id("COMM", 6),
-                channel=channel,
-                direction=random.choice(["Inbound", "Outbound"]),
-                timestamp=current_time.isoformat(),
-                subject=random.choice(subjects),
-                summary=f"Customer inquiry handled via {channel.lower()}. Issue {'resolved' if random.random() > 0.3 else 'pending'}.",
-                agent_id=f"AGT-{random.randint(100, 999)}" if random.random() > 0.2 else None,
-                sentiment=random.choice(["Positive", "Neutral", "Negative", "Frustrated", "Satisfied"]),
-                resolved=random.choice([True, False])
-            ))
-            current_time += timedelta(hours=random.randint(1, 48))
-        
-        return comms
-    
-    def generate_transaction(self) -> Dict[str, Any]:
-        """Generate a complete transaction record"""
-        self.transaction_counter += 1
-        
-        # Determine outcome with realistic distribution
-        outcomes = [
-            "completed", "payment_failed", "booking_failed", "ticketing_failed",
-            "refund_initiated", "refund_completed", "refund_rejected", "abandoned"
-        ]
-        weights = [45, 18, 12, 5, 8, 7, 2, 3]
-        outcome = random.choices(outcomes, weights=weights)[0]
-        
-        # Generate base data
-        airline = random.choice(app_config.AIRLINES)
-        customer = self.generate_customer()
-        flight = self.generate_flight(airline)
-        pricing = self.generate_pricing(flight)
-        
-        base_time = datetime.now() - timedelta(days=random.randint(0, 45))
-        
-        # Generate lifecycle
-        lifecycle = self.generate_lifecycle(outcome, base_time)
-        
-        # Determine status
-        status_map = {
-            "completed": "Completed",
-            "payment_failed": "Failed",
-            "booking_failed": "Failed",
-            "ticketing_failed": "Failed",
-            "refund_initiated": "Refund Pending",
-            "refund_completed": "Refunded",
-            "refund_rejected": "Refund Rejected",
-            "abandoned": "Abandoned"
-        }
-        
-        # Calculate SLA compliance
-        sla_breach = False
-        if "failed" in outcome:
-            created_time = datetime.fromisoformat(lifecycle["search"].timestamp)
-            hours_since_creation = (datetime.now() - created_time).total_seconds() / 3600
-            sla_breach = hours_since_creation > app_config.SLA_RESPONSE_TIME
-        
-        # Determine priority
-        priority = "Low"
-        if outcome in ["payment_failed", "ticketing_failed"]:
-            priority = random.choice(["High", "Critical"])
-        elif outcome == "booking_failed":
-            priority = random.choice(["Medium", "High"])
-        elif "refund" in outcome:
-            priority = "Medium"
-        
-        transaction = {
-            "transaction_id": f"TXN-{datetime.now().strftime('%Y%m')}-{self.generate_id('', 10)}",
-            "customer": asdict(customer),
-            "flight": asdict(flight),
-            "pricing": asdict(pricing),
-            "lifecycle": {k: asdict(v) if isinstance(v, LifecycleStage) else v for k, v in lifecycle.items()},
-            "status": status_map[outcome],
-            "outcome": outcome,
+
+        return {
+            "transaction_id": txn_id,
+            "created_at": created_at.isoformat(),
+            "updated_at": (created_at + timedelta(minutes=rng.randint(1, 120))).isoformat(),
+            "status": status,
             "priority": priority,
             "sla_breach": sla_breach,
-            "error_info": asdict(self.generate_error_info(outcome, lifecycle)) if self.generate_error_info(outcome, lifecycle) else None,
-            "refund_info": asdict(self.generate_refund_info(outcome, pricing, base_time)) if self.generate_refund_info(outcome, pricing, base_time) else None,
-            "agent_notes": [asdict(note) for note in self.generate_agent_notes(outcome, base_time)],
-            "communication_log": [asdict(comm) for comm in self.generate_communication_log(outcome, base_time)],
-            "created_at": base_time.isoformat(),
-            "last_updated": (base_time + timedelta(hours=random.randint(0, 72))).isoformat(),
-            "assigned_agent": f"AGT-{random.randint(100, 999)}" if random.random() > 0.4 else None,
-            "tags": random.sample(["VIP", "Urgent", "Repeat Issue", "Compensation", "Escalated", "First Contact"], k=random.randint(0, 2))
+
+            # NDC Flow tracking
+            "ndc_flow": {
+                "deepest_stage": deepest_stage,
+                "stage_index": stage_index,
+                **ndc_ids,
+            },
+
+            "customer": customer,
+            "flight": flight,
+            "pricing": pricing,
+            "lifecycle": lifecycle,
+            "error_info": error_info,
+            "refund_info": refund_info,
         }
-        
-        return transaction
-    
-    def generate_dataset(self, count: int = 200) -> List[Dict[str, Any]]:
-        """Generate a complete dataset of transactions"""
-        return [self.generate_transaction() for _ in range(count)]
+
+    def generate_many(self, count: int = 200) -> list[dict]:
+        transactions = []
+        for _ in range(count):
+            t = self.generate_transaction()
+            transactions.append(t)
+        return transactions
 
 
-def get_demo_data(count: int = 200, seed: int = 42) -> List[Dict[str, Any]]:
-    """Get demo transaction data"""
-    generator = DemoDataGenerator(seed=seed)
-    return generator.generate_dataset(count)
+def _build_lifecycle(
+    rng: random.Random,
+    created_at: datetime,
+    deepest_stage: str,
+    status: str,
+    ndc_ids: dict,
+) -> dict:
+    """
+    Build the lifecycle dict stage by stage.
+    Each stage carries the relevant IDs used/returned at that stage.
+    """
+    stage_index = NDC_STAGES.index(deepest_stage)
+    offset = 0  # minutes after created_at
+
+    def ts(extra_mins: int) -> str:
+        nonlocal offset
+        offset += extra_mins
+        return (created_at + timedelta(minutes=offset)).isoformat()
+
+    def stage_status(idx: int) -> str:
+        if idx < stage_index:
+            return "completed"
+        elif idx == stage_index:
+            return "failed" if status == "Failed" else ("completed" if status in ("Completed", "Refunded") else "in_progress")
+        else:
+            return "not_reached"
+
+    lifecycle = {}
+
+    # --- Shopping ---
+    lifecycle["shopping"] = {
+        "status": stage_status(0),
+        "timestamp": ts(rng.randint(1, 5)),
+        "search_results": ndc_ids.get("shopping_offer_count", 0),
+        "offer_ids": ndc_ids.get("shopping_offer_ids", []),
+        "filters_applied": rng.choice([True, False]),
+        "device": rng.choice(["web", "mobile", "api"]),
+    }
+
+    # --- OfferPrice ---
+    ofp_status = stage_status(1)
+    ofp_data = {
+        "status": ofp_status,
+        "timestamp": ts(rng.randint(1, 3)) if stage_index >= 1 else None,
+    }
+    if stage_index >= 1:
+        ofp_data["input_offer_id"] = ndc_ids.get("selected_shopping_offer_id")
+        ofp_data["priced_offer_id"] = ndc_ids.get("priced_offer_id")
+    lifecycle["offer_price"] = ofp_data
+
+    # --- SeatAvailability ---
+    seat_status = stage_status(2)
+    seat_data = {
+        "status": seat_status,
+        "timestamp": ts(rng.randint(1, 3)) if stage_index >= 2 else None,
+    }
+    if stage_index >= 2:
+        seat_data["seat_offer_ids"] = ndc_ids.get("seat_offer_ids", [])
+    lifecycle["seat_availability"] = seat_data
+
+    # --- ServiceAvailability ---
+    svc_status = stage_status(3)
+    svc_data = {
+        "status": svc_status,
+        "timestamp": ts(rng.randint(1, 3)) if stage_index >= 3 else None,
+    }
+    if stage_index >= 3:
+        svc_data["service_offer_ids"] = ndc_ids.get("service_offer_ids", [])
+    lifecycle["service_availability"] = svc_data
+
+    # --- OrderCreate ---
+    ord_status = stage_status(4)
+    ord_data = {
+        "status": ord_status,
+        "timestamp": ts(rng.randint(1, 5)) if stage_index >= 4 else None,
+    }
+    if stage_index >= 4:
+        ord_data["input_priced_offer_id"] = ndc_ids.get("priced_offer_id")
+        ord_data["input_seat_offer_ids"] = ndc_ids.get("seat_offer_ids", [])
+        ord_data["input_service_offer_ids"] = ndc_ids.get("service_offer_ids", [])
+        ord_data["order_id"] = ndc_ids.get("order_id")
+        if ord_status == "completed":
+            ord_data["pnr"] = generate_pnr(rng)
+            ord_data["e_ticket"] = generate_eticket(rng)
+            ord_data["confirmation_sent"] = True
+    lifecycle["order_create"] = ord_data
+
+    return lifecycle
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+@staticmethod
+def get_demo_data(count: int = 200, seed: int = 42) -> list[dict]:
+    gen = DemoDataGenerator(seed=seed)
+    return gen.generate_many(count)
+
+
+# Make get_demo_data importable at module level
+def get_demo_data(count: int = 200, seed: int = 42) -> list[dict]:
+    gen = DemoDataGenerator(seed=seed)
+    return gen.generate_many(count)
