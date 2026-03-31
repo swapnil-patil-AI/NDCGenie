@@ -33,29 +33,6 @@ def render_login_page() -> bool:
     if auth.is_authenticated():
         return True
     
-    # ── Infosys branding in the left sidebar on login page ──────────────────
-    with st.sidebar:
-        infosys_logo_b64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgODAiPgogIDx0ZXh0IHg9IjEwIiB5PSI2MiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSIzMDAiCiAgICAgICAgZm9udC1zaXplPSI2OCIgZmlsbD0iIzAwN0NDMyIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5JbmZvc3lzPC90ZXh0PgogIDx0ZXh0IHg9IjI4NSIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iMzAwIgogICAgICAgIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiMwMDdDQzMiPiYjMTc0OzwvdGV4dD4KPC9zdmc+"
-        st.markdown(f"""
-        <div style="
-            padding: 28px 16px 20px 16px;
-            border-bottom: 1px solid rgba(0,124,195,0.15);
-            margin-bottom: 8px;
-            text-align: center;
-        ">
-            <img src="data:image/svg+xml;base64,{infosys_logo_b64}"
-                 style="width: 130px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
-            <div style="
-                font-size: 0.68rem;
-                font-weight: 600;
-                color: #007CC3;
-                letter-spacing: 0.5px;
-                line-height: 1.5;
-                text-transform: uppercase;
-            ">An Infosys Travel &amp;<br>Hospitality Initiative</div>
-        </div>
-        """, unsafe_allow_html=True)
-
     # Custom CSS for login page
     st.markdown("""
     <style>
@@ -80,37 +57,6 @@ def render_login_page() -> bool:
         font-size: 13px;
         color: #718096;
         margin: 0;
-    }
-    
-    .demo-box {
-        background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-        border: 1px solid #9ae6b4;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-top: 15px;
-    }
-    
-    .demo-box-title {
-        color: #276749;
-        font-weight: 600;
-        font-size: 12px;
-        margin-bottom: 8px;
-    }
-    
-    .demo-table {
-        width: 100%;
-        font-size: 11px;
-    }
-    
-    .demo-table td {
-        padding: 4px 0;
-        color: #4a5568;
-    }
-    
-    .demo-table td:first-child {
-        font-weight: 600;
-        color: #2d3748;
-        width: 65px;
     }
     
     /* Form styling */
@@ -153,6 +99,26 @@ def render_login_page() -> bool:
     </style>
     """, unsafe_allow_html=True)
     
+    # Infosys logo + tagline — top of login page
+    infosys_logo_b64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgODAiPgogIDx0ZXh0IHg9IjEwIiB5PSI2MiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSIzMDAiCiAgICAgICAgZm9udC1zaXplPSI2OCIgZmlsbD0iIzAwN0NDMyIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5JbmZvc3lzPC90ZXh0PgogIDx0ZXh0IHg9IjI4NSIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iMzAwIgogICAgICAgIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiMwMDdDQzMiPiYjMTc0OzwvdGV4dD4KPC9zdmc+"
+    st.markdown(f"""
+    <div style="
+        text-align: center;
+        padding: 32px 0 8px 0;
+    ">
+        <img src="data:image/svg+xml;base64,{infosys_logo_b64}"
+             style="width: 150px; display: inline-block; margin-bottom: 8px;">
+        <div style="
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #007CC3;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        ">An Infosys Travel &amp; Hospitality Initiative</div>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Professional Corporate Logo
     logo_svg = '''<svg width="65" height="65" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1a365d"/><stop offset="50%" style="stop-color:#2b6cb0"/><stop offset="100%" style="stop-color:#4299e1"/></linearGradient><linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#ed8936"/><stop offset="100%" style="stop-color:#f6ad55"/></linearGradient></defs><circle cx="50" cy="50" r="48" fill="url(#lg1)"/><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/><g transform="translate(50, 50) rotate(-30)"><ellipse cx="0" cy="0" rx="28" ry="6" fill="white"/><ellipse cx="22" cy="0" rx="8" ry="5" fill="rgba(255,255,255,0.9)"/><path d="M -5 0 L -15 -18 L 5 -18 L 10 0 Z" fill="url(#lg2)"/><path d="M -5 0 L -15 18 L 5 18 L 10 0 Z" fill="url(#lg2)"/><path d="M -25 0 L -32 -10 L -22 -10 L -20 0 Z" fill="url(#lg2)"/><circle cx="10" cy="0" r="2" fill="#1a365d"/><circle cx="3" cy="0" r="1.5" fill="#1a365d"/><circle cx="-3" cy="0" r="1.5" fill="#1a365d"/></g><ellipse cx="50" cy="50" rx="44" ry="15" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" transform="rotate(-20, 50, 50)"/><circle cx="25" cy="38" r="3" fill="#48bb78"/><circle cx="75" cy="62" r="3" fill="#ed8936"/></svg>'''
     logo_b64 = base64.b64encode(logo_svg.encode()).decode()
@@ -195,19 +161,6 @@ def render_login_page() -> bool:
                     st.rerun()
                 else:
                     st.error("❌ " + message)
-        
-        # Demo credentials
-        st.markdown("""
-        <div class="demo-box">
-            <div class="demo-box-title">🔑 Demo Credentials</div>
-            <table class="demo-table">
-                <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
-                <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
-                <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
-                <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
     
     return False
 
