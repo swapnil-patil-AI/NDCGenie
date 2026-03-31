@@ -33,15 +33,12 @@ def render_login_page() -> bool:
     if auth.is_authenticated():
         return True
     
-    # Custom CSS for login page — hide sidebar toggle (sidebar is collapsed via set_page_config)
+    # Custom CSS for login page
     st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-
-    /* Hide the sidebar collapse/expand toggle button on login page */
-    [data-testid="collapsedControl"]   { display: none !important; }
     
     .login-header {
         text-align: center;
@@ -60,37 +57,6 @@ def render_login_page() -> bool:
         font-size: 13px;
         color: #718096;
         margin: 0;
-    }
-    
-    .demo-box {
-        background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-        border: 1px solid #9ae6b4;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-top: 15px;
-    }
-    
-    .demo-box-title {
-        color: #276749;
-        font-weight: 600;
-        font-size: 12px;
-        margin-bottom: 8px;
-    }
-    
-    .demo-table {
-        width: 100%;
-        font-size: 11px;
-    }
-    
-    .demo-table td {
-        padding: 4px 0;
-        color: #4a5568;
-    }
-    
-    .demo-table td:first-child {
-        font-weight: 600;
-        color: #2d3748;
-        width: 65px;
     }
     
     /* Form styling */
@@ -195,19 +161,6 @@ def render_login_page() -> bool:
                     st.rerun()
                 else:
                     st.error("❌ " + message)
-        
-        # Demo credentials
-        st.markdown("""
-        <div class="demo-box">
-            <div class="demo-box-title">🔑 Demo Credentials</div>
-            <table class="demo-table">
-                <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
-                <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
-                <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
-                <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
     
     return False
 
