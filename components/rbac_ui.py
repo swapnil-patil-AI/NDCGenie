@@ -33,17 +33,15 @@ def render_login_page() -> bool:
     if auth.is_authenticated():
         return True
     
-    # Custom CSS for login page — hide sidebar entirely
+    # Custom CSS for login page — hide sidebar toggle (sidebar is collapsed via set_page_config)
     st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Hide sidebar completely on login page */
-    [data-testid="stSidebar"]          { display: none !important; }
+    /* Hide the sidebar collapse/expand toggle button on login page */
     [data-testid="collapsedControl"]   { display: none !important; }
-    .css-1d391kg, .css-ffhzg2         { display: none !important; }
     
     .login-header {
         text-align: center;
@@ -199,17 +197,17 @@ def render_login_page() -> bool:
                     st.error("❌ " + message)
         
         # Demo credentials
-        #st.markdown("""
-        #<div class="demo-box">
-         #   <div class="demo-box-title">🔑 Demo Credentials</div>
-          #  <table class="demo-table">
-           #     <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
-            #    <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
-             #   <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
-              #  <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
-            #</table>
-        #</div>
-      #  """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class="demo-box">
+            <div class="demo-box-title">🔑 Demo Credentials</div>
+            <table class="demo-table">
+                <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
+                <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
+                <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
+                <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
     
     return False
 

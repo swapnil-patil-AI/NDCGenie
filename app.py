@@ -70,7 +70,7 @@ st.set_page_config(
     page_title=f"{app_config.APP_NAME} - {app_config.APP_DESCRIPTION}",
     page_icon="✈️",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded" if st.session_state.get("current_session") else "collapsed",
     menu_items={
         'About': f"""
         ## {app_config.APP_NAME} v{app_config.APP_VERSION}
