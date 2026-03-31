@@ -33,6 +33,29 @@ def render_login_page() -> bool:
     if auth.is_authenticated():
         return True
     
+    # ── Infosys branding in the left sidebar on login page ──────────────────
+    with st.sidebar:
+        infosys_logo_b64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgODAiPgogIDx0ZXh0IHg9IjEwIiB5PSI2MiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSIzMDAiCiAgICAgICAgZm9udC1zaXplPSI2OCIgZmlsbD0iIzAwN0NDMyIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5JbmZvc3lzPC90ZXh0PgogIDx0ZXh0IHg9IjI4NSIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iMzAwIgogICAgICAgIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiMwMDdDQzMiPiYjMTc0OzwvdGV4dD4KPC9zdmc+"
+        st.markdown(f"""
+        <div style="
+            padding: 28px 16px 20px 16px;
+            border-bottom: 1px solid rgba(0,124,195,0.15);
+            margin-bottom: 8px;
+            text-align: center;
+        ">
+            <img src="data:image/svg+xml;base64,{infosys_logo_b64}"
+                 style="width: 130px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+            <div style="
+                font-size: 0.68rem;
+                font-weight: 600;
+                color: #007CC3;
+                letter-spacing: 0.5px;
+                line-height: 1.5;
+                text-transform: uppercase;
+            ">An Infosys Travel &amp;<br>Hospitality Initiative</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     # Custom CSS for login page
     st.markdown("""
     <style>
@@ -173,8 +196,18 @@ def render_login_page() -> bool:
                 else:
                     st.error("❌ " + message)
         
-        # Demo credentials admin / Admin@123
-       
+        # Demo credentials
+        st.markdown("""
+        <div class="demo-box">
+            <div class="demo-box-title">🔑 Demo Credentials</div>
+            <table class="demo-table">
+                <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
+                <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
+                <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
+                <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
     
     return False
 

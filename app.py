@@ -555,8 +555,29 @@ def render_sidebar():
             <div style="font-size: 0.75rem; color: #718096;">Enterprise Edition v2.0</div>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown("---")
+
+        # ── Infosys branding ──────────────────────────────────────────────────
+        _inf_logo = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgODAiPgogIDx0ZXh0IHg9IjEwIiB5PSI2MiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSIzMDAiCiAgICAgICAgZm9udC1zaXplPSI2OCIgZmlsbD0iIzAwN0NDMyIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5JbmZvc3lzPC90ZXh0PgogIDx0ZXh0IHg9IjI4NSIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iMzAwIgogICAgICAgIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiMwMDdDQzMiPiYjMTc0OzwvdGV4dD4KPC9zdmc+"
+        st.markdown(f"""
+        <div style="
+            text-align: center;
+            padding: 10px 12px 14px 12px;
+            border-top: 1px solid rgba(0,124,195,0.15);
+            border-bottom: 1px solid rgba(0,124,195,0.15);
+            margin-bottom: 4px;
+        ">
+            <img src="data:image/svg+xml;base64,{_inf_logo}"
+                 style="width: 110px; margin-bottom: 6px; display: block; margin-left: auto; margin-right: auto;">
+            <div style="
+                font-size: 0.64rem;
+                font-weight: 600;
+                color: #007CC3;
+                letter-spacing: 0.4px;
+                line-height: 1.5;
+                text-transform: uppercase;
+            ">An Infosys Travel &amp;<br>Hospitality Initiative</div>
+        </div>
+        """, unsafe_allow_html=True)
         
         # API Configuration - Read from Streamlit Secrets
         st.markdown("### 🔑 API Status")
