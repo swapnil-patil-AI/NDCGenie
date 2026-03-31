@@ -39,6 +39,8 @@ def render_login_page() -> bool:
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    /* Restore sidebar collapse/expand toggle button */
+    [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
     
     .login-header {
         text-align: center;
