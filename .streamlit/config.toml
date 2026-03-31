@@ -17,7 +17,7 @@ serverAddress = "localhost"
 
 [client]
 showErrorDetails = false
-toolbarMode = "minimal"
+toolbarMode = "viewer"
 
 [runner]
 fastReruns = true
