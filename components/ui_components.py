@@ -100,12 +100,14 @@ def inject_custom_css():
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }}
         
-        /* Hide Streamlit branding but keep sidebar toggle visible */
+        /* Hide Streamlit branding - target specific elements, NOT the whole header */
         #MainMenu {{visibility: hidden;}}
         footer {{visibility: hidden;}}
-        header {{visibility: hidden;}}
-        /* Restore sidebar collapse/expand toggle button */
-        [data-testid="collapsedControl"] {{visibility: visible !important; display: block !important;}}
+        /* Hide deploy/share toolbar but keep sidebar toggle in header */
+        [data-testid="stToolbar"] {{display: none !important;}}
+        [data-testid="stDecoration"] {{display: none !important;}}
+        [data-testid="stStatusWidget"] {{display: none !important;}}
+        header[data-testid="stHeader"] {{background: transparent !important; border-bottom: none !important;}}
         
         /* ═══════════════════════════════════════════════════════════════
            HEADER COMPONENT

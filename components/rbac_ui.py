@@ -38,9 +38,11 @@ def render_login_page() -> bool:
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
-    /* Restore sidebar collapse/expand toggle button */
-    [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
+    /* Hide deploy/share toolbar but keep sidebar toggle in header */
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    header[data-testid="stHeader"] {background: transparent !important; border-bottom: none !important;}
     
     .login-header {
         text-align: center;
