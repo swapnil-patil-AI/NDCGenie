@@ -199,17 +199,17 @@ def render_login_page() -> bool:
                     st.error("❌ " + message)
         
         # Demo credentials
-        st.markdown("""
-        <div class="demo-box">
-            <div class="demo-box-title">🔑 Demo Credentials</div>
-            <table class="demo-table">
-                <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
-                <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
-                <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
-                <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
+        #st.markdown("""
+        #<div class="demo-box">
+         #   <div class="demo-box-title">🔑 Demo Credentials</div>
+          #  <table class="demo-table">
+           #     <tr><td>Admin:</td><td>admin / Admin@123</td></tr>
+            #    <tr><td>Manager:</td><td>manager / Manager@123</td></tr>
+             #   <tr><td>Agent:</td><td>agent / Agent@123</td></tr>
+              #  <tr><td>Viewer:</td><td>viewer / Viewer@123</td></tr>
+            #</table>
+        #</div>
+      #  """, unsafe_allow_html=True)
     
     return False
 
