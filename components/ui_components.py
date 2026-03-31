@@ -108,6 +108,9 @@ def inject_custom_css():
         [data-testid="stDecoration"] {{display: none !important;}}
         [data-testid="stStatusWidget"] {{display: none !important;}}
         header[data-testid="stHeader"] {{background: transparent !important; border-bottom: none !important;}}
+        /* Hide sidebar toggle button — sidebar is always visible */
+        [data-testid="collapsedControl"] {{display: none !important;}}
+        button[kind="header"] {{display: none !important;}}
         
         /* ═══════════════════════════════════════════════════════════════
            HEADER COMPONENT
